@@ -39,17 +39,10 @@ server.route({
     method: "GET",
     path: "/products",
     handler: (request, h) => __awaiter(void 0, void 0, void 0, function* () {
-        const offset = request.query.offset;
+        const offset = request.query.offset - 1;
         const count = request.query.count;
         const data = yield mydb.any(`SELECT *
-    FROM 
-    (
-        SELECT 
-          Row_Number() OVER (Order By sku) As RowNum
-        , *
-        FROM public.products
-    ) t2
-    WHERE RowNum >= ${offset} LIMIT ${count}`);
+    FROM public.products ORDER BY id LIMIT ${count} OFFSET ${offset}`);
         yield Promise.all(data.map((e) => __awaiter(void 0, void 0, void 0, function* () {
             e.images = yield mydb.any(`SELECT src
       FROM public.images WHERE prod_id =  ${e.id}`);

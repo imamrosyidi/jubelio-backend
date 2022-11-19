@@ -44,14 +44,7 @@ server.route({
     const offset: Number = request.query.offset;
     const count: Number = request.query.count;
     const data: Array<Product> = await mydb.any(`SELECT *
-    FROM 
-    (
-        SELECT 
-          Row_Number() OVER (Order By sku) As RowNum
-        , *
-        FROM public.products
-    ) t2
-    WHERE RowNum >= ${offset} LIMIT ${count}`);
+    FROM public.products ORDER BY id LIMIT ${count} OFFSET ${offset}`);
 
     await Promise.all(
       data.map(async (e: Product) => {
@@ -66,7 +59,7 @@ server.route({
     validate: {
       query: Joi.object({
         count: Joi.number().integer().min(1).max(100).default(8),
-        offset: Joi.number().integer().min(1).default(1),
+        offset: Joi.number().integer().min(1).default(0),
       }),
     },
   },
